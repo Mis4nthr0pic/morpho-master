@@ -1,0 +1,8 @@
+.aidesigner/*
+!.aidesigner/.gitkeep
+.env
+data/*.ndjson
+node_modules/
+.agents/*
+.claude/*
+.codex/*

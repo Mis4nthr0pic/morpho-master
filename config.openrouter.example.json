@@ -1,0 +1,8 @@
+{
+  "openrouter": {
+    "enabled": false,
+    "api_key": "",
+    "model": "anthropic/claude-3.5-sonnet",
+    "interview_personality": "skeptical_cto"
+  }
+}

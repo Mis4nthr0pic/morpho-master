@@ -1,0 +1,498 @@
+{
+  "questions": [
+    {
+      "id": "why-morpho-60sec",
+      "category": "pitch",
+      "difficulty": "critical",
+      "title": "Why Morpho? (The 60-Second Pitch)",
+      "question": "Give me your 60-second answer to 'Why Morpho?' as if you're talking to a skeptical CTO who currently uses Aave. Focus on technical differentiators, not marketing fluff.",
+      "evaluationCriteria": {
+        "mustInclude": [
+          "isolated markets vs pooled risk",
+          "immutability",
+          "better capital efficiency",
+          "permissionless market creation"
+        ],
+        "avoid": [
+          "just saying 'better' without explanation",
+          "ignoring the tradeoffs",
+          "marketing slogans without technical substance"
+        ],
+        "bonusPoints": [
+          "mentions $10B+ TVL as validation",
+          "addresses migration cost/benefit",
+          "explains curator role"
+        ]
+      },
+      "rubric": {
+        "technicalAccuracy": 30,
+        "clarity": 25,
+        "completeness": 25,
+        "persuasiveness": 20
+      },
+      "minWords": 50,
+      "maxWords": 200,
+      "estimatedEvalCost": "$0.002"
+    },
+    {
+      "id": "isolated-vs-pooled",
+      "category": "core-concepts",
+      "difficulty": "fundamental",
+      "title": "Isolated vs Pooled Lending",
+      "question": "Explain the difference between isolated lending (Morpho) and pooled lending (Aave/Compound). What are the tradeoffs? When would you recommend one over the other?",
+      "evaluationCriteria": {
+        "mustInclude": [
+          "risk containment explanation",
+          "contagion risk difference",
+          "capital efficiency tradeoff",
+          "specific use case recommendation"
+        ],
+        "avoid": [
+          "saying one is always better",
+          "missing the UX complexity tradeoff",
+          "ignoring gas costs"
+        ],
+        "bonusPoints": [
+          "mentions market-specific LLTV optimization",
+          "discusses oracle risk isolation",
+          "explains why $10B+ migrated to isolated"
+        ]
+      },
+      "rubric": {
+        "technicalAccuracy": 35,
+        "nuance": 30,
+        "practicalApplication": 20,
+        "clarity": 15
+      },
+      "minWords": 80,
+      "maxWords": 250,
+      "estimatedEvalCost": "$0.003"
+    },
+    {
+      "id": "lltv-liquidation-math",
+      "category": "technical-deep-dive",
+      "difficulty": "intermediate",
+      "title": "LLTV and Liquidation Math",
+      "question": "A user has 10 ETH as collateral (price $2500/ETH) in a market with 86% LLTV. They borrow 18,000 USDC.\n\n1. What is their current health factor?\n2. At what ETH price will they be liquidatable?\n3. If liquidated, what happens to their position?",
+      "evaluationCriteria": {
+        "mustInclude": [
+          "correct health factor calculation (~1.19)",
+          "correct liquidation price (~$2093)",
+          "explanation of liquidation bonus",
+          "mention of partial liquidation possibility"
+        ],
+        "avoid": [
+          "wrong decimal handling",
+          "ignoring liquidation incentive",
+          "saying position is immediately at risk"
+        ],
+        "bonusPoints": [
+          "shows the formula",
+          "mentions oracle staleness buffer",
+          "explains bad debt scenario"
+        ]
+      },
+      "rubric": {
+        "calculationAccuracy": 40,
+        "explanationClarity": 30,
+        "edgeCaseAwareness": 20,
+        "formulaPresentation": 10
+      },
+      "minWords": 100,
+      "maxWords": 300,
+      "estimatedEvalCost": "$0.003"
+    },
+    {
+      "id": "health-factor-formula",
+      "category": "technical-deep-dive",
+      "difficulty": "intermediate",
+      "title": "Health Factor Implementation",
+      "question": "Write the TypeScript function to calculate health factor for a Morpho position. Include proper BigInt handling and explain each step.",
+      "evaluationCriteria": {
+        "mustInclude": [
+          "proper BigInt syntax (10n**18n or 10n ** 18n)",
+          "correct formula: (collateral * price * lltv) / (borrow * WAD)",
+          "division after multiplication to avoid truncation",
+          "explanation of WAD (18 decimals)"
+        ],
+        "avoid": [
+          "using Number() which loses precision",
+          "wrong order of operations",
+          "missing edge case (borrow = 0)"
+        ],
+        "bonusPoints": [
+          "handles zero borrow case",
+          "includes types/interfaces",
+          "adds comments explaining scaling"
+        ]
+      },
+      "rubric": {
+        "codeCorrectness": 40,
+        "bigIntHandling": 25,
+        "explanationQuality": 25,
+        "edgeCases": 10
+      },
+      "minWords": 80,
+      "maxWords": 300,
+      "estimatedEvalCost": "$0.003"
+    },
+    {
+      "id": "four-roles",
+      "category": "architecture",
+      "difficulty": "intermediate",
+      "title": "The 4-Role System",
+      "question": "Explain the 4-role system in MetaMorpho vaults. For each role (Owner, Curator, Guardian, Allocator), what can they do, what risks do they mitigate, and what happens if they act maliciously?",
+      "evaluationCriteria": {
+        "mustInclude": [
+          "Owner: governance, fees, timelocked",
+          "Curator: allocation strategy, market caps",
+          "Guardian: emergency pause, protects against exploits",
+          "Allocator: execution of rebalancing"
+        ],
+        "avoid": [
+          "confusing curator and allocator",
+          "missing timelock protection",
+          "not explaining guardian's limited power"
+        ],
+        "bonusPoints": [
+          "explains role separation benefits",
+          "mentions real-world examples",
+          "discusses curator reputation importance"
+        ]
+      },
+      "rubric": {
+        "roleAccuracy": 35,
+        "riskExplanation": 25,
+        "securityModel": 20,
+        "realWorldContext": 20
+      },
+      "minWords": 120,
+      "maxWords": 350,
+      "estimatedEvalCost": "$0.004"
+    },
+    {
+      "id": "bundler3-ordering",
+      "category": "integration",
+      "difficulty": "intermediate",
+      "title": "Bundler3 Operation Ordering",
+      "question": "A partner wants to build a leveraged ETH position: supply ETH collateral, borrow USDC, swap USDC for more ETH, supply that ETH as additional collateral.\n\nWhat is the correct bundle order? What happens if they get the order wrong?",
+      "evaluationCriteria": {
+        "mustInclude": [
+          "correct order: supply collateral → borrow → swap → supply collateral",
+          "explanation of atomic execution",
+          "what happens if borrow comes first (revert)",
+          "mention of slippage protection on swap"
+        ],
+        "avoid": [
+          "wrong order",
+          "missing the second supply step",
+          "not explaining why it fails"
+        ],
+        "bonusPoints": [
+          "mentions permit2 for approvals",
+          "includes error handling strategy",
+          "suggests simulation first"
+        ]
+      },
+      "rubric": {
+        "orderCorrectness": 35,
+        "explanationQuality": 25,
+        "failureAnalysis": 25,
+        "bestPractices": 15
+      },
+      "minWords": 80,
+      "maxWords": 250,
+      "estimatedEvalCost": "$0.003"
+    },
+    {
+      "id": "partner-debug-scenario",
+      "category": "partner-support",
+      "difficulty": "expert",
+      "title": "Support Triage Scenario",
+      "question": "A partner messages you: 'Users getting weird errors when trying to withdraw. Some work, some don't. No pattern I can see. Help!'\n\nWhat are your first 3 questions? What do you suspect? How do you investigate?",
+      "evaluationCriteria": {
+        "mustInclude": [
+          "asks for specific error messages",
+          "asks for transaction hashes",
+          "checks market liquidity/utilization",
+          "suspects utilization or caps issue"
+        ],
+        "avoid": [
+          "vague 'check the docs' response",
+          "not asking for specific examples",
+          "ignoring the 'some work' clue"
+        ],
+        "bonusPoints": [
+          "mentions checking different markets",
+          "suggests specific RPC queries",
+          "provides code snippet to diagnose"
+        ]
+      },
+      "rubric": {
+        "triageQuality": 35,
+        "questionQuality": 25,
+        "technicalApproach": 25,
+        "communicationTone": 15
+      },
+      "minWords": 100,
+      "maxWords": 300,
+      "estimatedEvalCost": "$0.003"
+    },
+    {
+      "id": "oracle-risk-assessment",
+      "category": "risk",
+      "difficulty": "intermediate",
+      "title": "Oracle Risk Assessment",
+      "question": "A partner wants to create a new market with a custom oracle. What do you tell them to check? What are the risks? How do you verify an oracle is safe?",
+      "evaluationCriteria": {
+        "mustInclude": [
+          "feed freshness (heartbeat)",
+          "deviation threshold",
+          "source reputation (Chainlink/Redstone)",
+          "decimal normalization (must be 18)",
+          "L2 sequencer uptime"
+        ],
+        "avoid": [
+          "just saying 'use Chainlink'",
+          "ignoring L2 considerations",
+          "not mentioning stale price risk"
+        ],
+        "bonusPoints": [
+          "mentions oracle manipulation history",
+          "suggests multi-sig or TWAP for illiquid assets",
+          "explains price impact on liquidations"
+        ]
+      },
+      "rubric": {
+        "technicalDepth": 30,
+        "riskAwareness": 30,
+        "practicalChecks": 25,
+        "historicalContext": 15
+      },
+      "minWords": 100,
+      "maxWords": 300,
+      "estimatedEvalCost": "$0.003"
+    },
+    {
+      "id": "explain-to-pm",
+      "category": "communication",
+      "difficulty": "intermediate",
+      "title": "Explain to a Product Manager",
+      "question": "Explain what MetaMorpho vaults are to a Product Manager who's technical but not a blockchain expert. They need to understand:\n1. What users actually do\n2. What value it provides\n3. What risks exist\n4. Integration complexity",
+      "evaluationCriteria": {
+        "mustInclude": [
+          "simple deposit/withdraw UX",
+          "curator manages complexity",
+          "yield optimization across markets",
+          "curator risk and guardian protection"
+        ],
+        "avoid": [
+          "jargon without explanation",
+          "missing the 'why' for users",
+          "overselling - no risk mention"
+        ],
+        "bonusPoints": [
+          "compares to traditional finance (fund manager)",
+          "mentions ERC4626 compatibility benefit",
+          "addresses integration timeline"
+        ]
+      },
+      "rubric": {
+        "clarity": 30,
+        "accuracy": 25,
+        "appropriateness": 25,
+        "riskTransparency": 20
+      },
+      "minWords": 100,
+      "maxWords": 300,
+      "estimatedEvalCost": "$0.003"
+    },
+    {
+      "id": "rate-model-explanation",
+      "category": "core-concepts",
+      "difficulty": "intermediate",
+      "title": "Interest Rate Model",
+      "question": "Explain how the Adaptive Curve IRM works. Why do rates change? What's the relationship between utilization and rates? Why does this matter for users?",
+      "evaluationCriteria": {
+        "mustInclude": [
+          "rates increase with utilization",
+          "target utilization concept",
+          "supply APY vs borrow APR relationship",
+          "no protocol fees currently"
+        ],
+        "avoid": [
+          "fixed rate assumption",
+          "ignoring utilization mechanics",
+          "wrong APY/APR relationship"
+        ],
+        "bonusPoints": [
+          "explains rate volatility management",
+          "compares to traditional models",
+          "mentions optimal utilization range"
+        ]
+      },
+      "rubric": {
+        "mechanicsAccuracy": 35,
+        "relationshipClarity": 25,
+        "userImpact": 25,
+        "practicalContext": 15
+      },
+      "minWords": 80,
+      "maxWords": 250,
+      "estimatedEvalCost": "$0.003"
+    },
+    {
+      "id": "v1-v2-migration",
+      "category": "architecture",
+      "difficulty": "expert",
+      "title": "V1.1 to V2 Migration",
+      "question": "A partner has integrated MetaMorpho V1.1 and wants to migrate to V2. What should they check? What might break? What are the key differences?",
+      "evaluationCriteria": {
+        "mustInclude": [
+          "adapter pattern changes",
+          "share conversion considerations",
+          "rebalancing mechanics differences",
+          "gas optimization improvements"
+        ],
+        "avoid": [
+          "saying it's a drop-in replacement",
+          "ignoring share price differences",
+          "missing adapter-specific changes"
+        ],
+        "bonusPoints": [
+          "suggests migration testing plan",
+          "mentions new features they can use",
+          "provides code comparison"
+        ]
+      },
+      "rubric": {
+        "technicalAccuracy": 35,
+        "migrationPlanning": 25,
+        "riskIdentification": 25,
+        "practicalGuidance": 15
+      },
+      "minWords": 100,
+      "maxWords": 300,
+      "estimatedEvalCost": "$0.003"
+    },
+    {
+      "id": "public-allocator",
+      "category": "advanced",
+      "difficulty": "advanced",
+      "title": "Public Allocator Mechanics",
+      "question": "What is the Public Allocator? Why does it exist? How does it benefit vault users? When would someone use it?",
+      "evaluationCriteria": {
+        "mustInclude": [
+          "permissionless rebalancing",
+          "optimizes yield across markets",
+          "incentivizes optimal allocation",
+          "reduces curator operational burden"
+        ],
+        "avoid": [
+          "confusing it with governance",
+          "missing the incentive structure",
+          "not explaining when it's needed"
+        ],
+        "bonusPoints": [
+          "explains reallocation conditions",
+          "mentions MEV considerations",
+          "discusses gas vs reward tradeoff"
+        ]
+      },
+      "rubric": {
+        "mechanicsClarity": 30,
+        "valueProposition": 25,
+        "incentiveUnderstanding": 25,
+        "practicalUsage": 20
+      },
+      "minWords": 80,
+      "maxWords": 250,
+      "estimatedEvalCost": "$0.003"
+    },
+    {
+      "id": "discovery-questions",
+      "category": "partner-support",
+      "difficulty": "intermediate",
+      "title": "Integration Discovery",
+      "question": "You're on a call with a new potential partner. What 5 questions do you ask to properly scope their Morpho integration? Why each question?",
+      "evaluationCriteria": {
+        "mustInclude": [
+          "chain and tech stack",
+          "read vs write integration",
+          "user flow/use case",
+          "timeline",
+          "risk tolerance"
+        ],
+        "avoid": [
+          "generic questions",
+          "missing technical specifics",
+          "not explaining why each matters"
+        ],
+        "bonusPoints": [
+          "includes existing DeFi experience question",
+          "asks about team composition",
+          "questions about compliance requirements"
+        ]
+      },
+      "rubric": {
+        "questionQuality": 35,
+        "rationaleClarity": 30,
+        "technicalRelevance": 20,
+        "discoveryDepth": 15
+      },
+      "minWords": 120,
+      "maxWords": 350,
+      "estimatedEvalCost": "$0.004"
+    },
+    {
+      "id": "write-integration-docs",
+      "category": "communication",
+      "difficulty": "expert",
+      "title": "Write Integration Documentation",
+      "question": "Write the 'Common Errors' section for Morpho integration docs. Include at least 4 errors, their causes, and solutions.",
+      "evaluationCriteria": {
+        "mustInclude": [
+          "insufficient liquidity error",
+          "unauthorized error",
+          "position not healthy error",
+          "slippage exceeded error"
+        ],
+        "avoid": [
+          "vague solutions",
+          "missing code examples",
+          "generic error descriptions"
+        ],
+        "bonusPoints": [
+          "includes specific error messages",
+          "provides debugging code snippets",
+          "adds prevention strategies"
+        ]
+      },
+      "rubric": {
+        "accuracy": 30,
+        "actionability": 30,
+        "clarity": 25,
+        "completeness": 15
+      },
+      "minWords": 150,
+      "maxWords": 400,
+      "estimatedEvalCost": "$0.004"
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "totalQuestions": 15,
+    "estimatedTotalEvalCost": "$0.045",
+    "categories": {
+      "pitch": ["why-morpho-60sec"],
+      "core-concepts": ["isolated-vs-pooled", "rate-model-explanation"],
+      "technical-deep-dive": ["lltv-liquidation-math", "health-factor-formula"],
+      "architecture": ["four-roles", "v1-v2-migration"],
+      "integration": ["bundler3-ordering"],
+      "partner-support": ["partner-debug-scenario", "discovery-questions"],
+      "risk": ["oracle-risk-assessment"],
+      "communication": ["explain-to-pm", "write-integration-docs"],
+      "advanced": ["public-allocator"]
+    }
+  }
+}

@@ -1,0 +1,16 @@
+services:
+  morpho-trainer:
+    build: .
+    command: npm run dev
+    ports:
+      - "3456:3000"
+    volumes:
+      - ./src:/app/src
+      - ./data:/app/data
+      - ./public:/app/public
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+    restart: unless-stopped

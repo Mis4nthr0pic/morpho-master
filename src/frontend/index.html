@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moprho Integrator Tool</title>
+    <link rel="icon" type="image/svg+xml" href="public/favicon-butterfly.svg">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/learning.css">
+    <link rel="stylesheet" href="css/code-lab.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/typescript@5.8.2/lib/typescript.min.js"></script>
+</head>
+<body>
+    <button id="sidebar-toggle" class="sidebar-toggle" type="button" aria-label="Toggle navigation">
+        <span class="sidebar-toggle-line"></span>
+        <span class="sidebar-toggle-line"></span>
+        <span class="sidebar-toggle-line"></span>
+    </button>
+    <div id="app">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-topline">
+                    <div class="logo">
+                        <span class="logo-icon">🦋</span>
+                        <div class="logo-copy">
+                            <span class="logo-text">Moprho Integrator Tool</span>
+                            <span class="logo-subtext">Partner Engineer Mode</span>
+                        </div>
+                    </div>
+                    <button id="sidebar-collapse-btn" class="sidebar-collapse-btn" type="button" aria-label="Collapse sidebar">
+                        <svg class="collapse-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="user-badge">
+                    <div class="user-avatar">A</div>
+                    <div class="user-copy">
+                        <span class="user-name">Alex</span>
+                        <span class="user-role">Three-day lock-in</span>
+                    </div>
+                </div>
+                <div class="theme-switcher">
+                    <span class="theme-switcher-label">Theme</span>
+                    <div class="theme-pills" role="group" aria-label="Theme switcher">
+                        <button class="theme-pill" type="button" data-theme="dark"><span class="theme-pill-icon">🌙</span><span>Night</span></button>
+                        <button class="theme-pill" type="button" data-theme="pastel"><span class="theme-pill-icon">🫧</span><span>Pastel</span></button>
+                        <button class="theme-pill" type="button" data-theme="white"><span class="theme-pill-icon">🦋</span><span>Paper</span></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Study Timer -->
+            <div class="study-timer-card">
+                <div class="timer-label">Study Session</div>
+                <div class="timer-display" id="timer-display">00:00:00</div>
+                <div class="timer-controls">
+                    <button id="timer-start" class="timer-btn primary">Start</button>
+                    <button id="timer-pause" class="timer-btn" style="display:none">Pause</button>
+                    <button id="timer-stop" class="timer-btn danger" style="display:none">Stop</button>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="#dashboard" class="nav-link active" data-page="dashboard">
+                        <span class="nav-icon">📊</span><span class="nav-label">Dashboard</span>
+                    </a></li>
+                    <li><a href="#learn" class="nav-link" data-page="learn">
+                        <span class="nav-icon">📚</span><span class="nav-label">Learn</span>
+                    </a></li>
+                    <li><a href="#base-knowledge" class="nav-link" data-page="base-knowledge">
+                        <span class="nav-icon">🧠</span><span class="nav-label">Base Knowledge</span>
+                    </a></li>
+                    <li><a href="#review" class="nav-link" data-page="review">
+                        <span class="nav-icon">🔄</span><span class="nav-label">Review</span> <span id="review-badge" class="nav-badge">0</span>
+                    </a></li>
+                    <li><a href="#quiz" class="nav-link" data-page="quiz">
+                        <span class="nav-icon">❓</span><span class="nav-label">Quiz</span>
+                    </a></li>
+                    <li><a href="#practice" class="nav-link" data-page="practice">
+                        <span class="nav-icon">🎤</span><span class="nav-label">Use Cases</span>
+                    </a></li>
+                    <li><a href="#code" class="nav-link" data-page="code">
+                        <span class="nav-icon">💻</span><span class="nav-label">Code Lab</span>
+                    </a></li>
+                    <li><a href="#progress" class="nav-link" data-page="progress">
+                        <span class="nav-icon">📈</span><span class="nav-label">Progress</span>
+                    </a></li>
+                    <li><a href="#settings" class="nav-link" data-page="settings">
+                        <span class="nav-icon">⚙️</span><span class="nav-label">Settings</span>
+                    </a></li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                    <div class="stats-preview">
+                    <div class="stat-item">
+                        <span class="stat-value" id="stat-modules">0/10</span>
+                        <span class="stat-label">Modules</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="stat-review">0</span>
+                        <span class="stat-label">Due</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Page -->
+            <div id="dashboard" class="page active">
+                <div class="page-header">
+                    <h1>Dashboard</h1>
+                    <p class="subtitle">3 days until interview. Let's make them count.</p>
+                </div>
+
+                    <div class="dashboard-grid">
+                    <!-- Progress Card -->
+                    <div class="dashboard-card progress-card">
+                        <h3>Interview Readiness</h3>
+                        <div class="progress-ring-container">
+                            <svg class="progress-ring" viewBox="0 0 100 100">
+                                <circle class="progress-ring-bg" cx="50" cy="50" r="45"/>
+                                <circle class="progress-ring-fill" id="overall-progress" cx="50" cy="50" r="45"/>
+                            </svg>
+                            <div class="progress-text">
+                                <span id="progress-percent">0%</span>
+                            </div>
+                        </div>
+                        <p class="progress-label" id="readiness-label">Just getting started</p>
+                    </div>
+
+                    <!-- Today's Focus -->
+                    <div class="dashboard-card focus-card">
+                        <h3>🎯 Today's Focus</h3>
+                        <div id="today-focus" class="focus-list">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <h3>Weak Concepts</h3>
+                        <div id="weak-concepts" class="chips-list">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Review Queue -->
+                    <div class="dashboard-card review-card">
+                        <h3>🔄 Due for Review</h3>
+                        <div id="review-queue-preview" class="review-preview">
+                            <div class="zero-state">
+                                <div class="zero-state-icon">🎉</div>
+                                <div class="zero-state-title">All caught up!</div>
+                                <div class="zero-state-body">No cards due for review right now.</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-full" onclick="navigateTo('review')">
+                            Start Review Session
+                        </button>
+                    </div>
+
+                    <!-- 3-Day Plan -->
+                    <div class="dashboard-card plan-card">
+                        <h3>📅 3-Day Study Plan</h3>
+                        <div class="plan-days">
+                            <div class="plan-day" data-day="1">
+                                <div class="day-header">
+                                    <span class="day-number">Day 1</span>
+                                    <span class="day-theme">Foundations</span>
+                                    <span class="day-status">Today</span>
+                                </div>
+                                <ul>
+                                    <li>Protocol Foundations (3h)</li>
+                                    <li>LLTV & Liquidation Math</li>
+                                    <li>Quiz: Fundamentals</li>
+                                </ul>
+                            </div>
+                            <div class="plan-day" data-day="2">
+                                <div class="day-header">
+                                    <span class="day-number">Day 2</span>
+                                    <span class="day-theme">Integration</span>
+                                    <span class="day-status">Tomorrow</span>
+                                </div>
+                                <ul>
+                                    <li>Architecture Deep-Dive</li>
+                                    <li>Integration Patterns</li>
+                                    <li>Code Challenges</li>
+                                </ul>
+                            </div>
+                            <div class="plan-day" data-day="3">
+                                <div class="day-header">
+                                    <span class="day-number">Day 3</span>
+                                    <span class="day-theme">Mastery</span>
+                                    <span class="day-status">Interview Day</span>
+                                </div>
+                                <ul>
+                                    <li>Partner Communication</li>
+                                    <li>Pitch Mastery</li>
+                                    <li>Mock Interview</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <h3>Job Readiness</h3>
+                        <div id="job-readiness" class="checklist-stack">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Learn Page - Module List -->
+            <div id="learn" class="page">
+                <div class="page-header">
+                    <h1>Learning Modules</h1>
+                    <p class="subtitle">Loading the full bootcamp...</p>
+                </div>
+                <div id="modules-container" class="modules-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <div id="base-knowledge" class="page">
+                <div class="page-header">
+                    <h1 id="base-knowledge-title">Base Knowledge</h1>
+                    <p id="base-knowledge-subtitle" class="subtitle">Foundational Morpho understanding for sharp interview answers and partner-facing clarity.</p>
+                </div>
+                <div id="base-knowledge-shell" class="base-knowledge-shell">
+                    <div class="base-knowledge-loading">Loading foundational concepts...</div>
+                </div>
+            </div>
+
+            <!-- Lesson Page - Individual Lesson -->
+            <div id="lesson" class="page">
+                <div class="lesson-layout">
+                    <!-- Lesson Sidebar -->
+                    <aside class="lesson-sidebar">
+                        <div class="lesson-nav-header">
+                            <a href="#learn" class="back-link" onclick="navigateTo('learn')">← All Modules</a>
+                            <h3 id="lesson-module-title">Module</h3>
+                        </div>
+                        <div id="lesson-nav-list" class="lesson-nav-list">
+                            <!-- Populated by JS -->
+                        </div>
+                    </aside>
+
+                    <!-- Lesson Content -->
+                    <article class="lesson-content-area">
+                        <header class="lesson-header">
+                            <div class="lesson-header-top">
+                                <div class="lesson-meta">
+                                    <span id="lesson-number">Lesson 1</span>
+                                    <span id="lesson-duration">⏱ 20 min</span>
+                                    <span id="lesson-difficulty" class="difficulty-badge">Fundamental</span>
+                                </div>
+                                <div class="lesson-zoom-controls" aria-label="Lesson zoom controls">
+                                    <span class="lesson-zoom-label">Zoom</span>
+                                    <button id="lesson-zoom-out" class="lesson-zoom-btn" type="button" aria-label="Zoom out">A-</button>
+                                    <button id="lesson-zoom-reset" class="lesson-zoom-btn lesson-zoom-value" type="button" aria-label="Reset zoom">
+                                        <span id="lesson-zoom-value">100%</span>
+                                    </button>
+                                    <button id="lesson-zoom-in" class="lesson-zoom-btn" type="button" aria-label="Zoom in">A+</button>
+                                </div>
+                            </div>
+                            <h1 id="lesson-title">Lesson Title</h1>
+                            <p id="lesson-objective" class="lesson-objective">Objective</p>
+                        </header>
+
+                        <div id="lesson-body" class="lesson-body">
+                            <!-- Populated by JS -->
+                        </div>
+
+                        <section id="lesson-lens" class="lesson-lens-section">
+                            <!-- Populated by JS -->
+                        </section>
+
+                        <section id="lesson-next-reps" class="lesson-next-reps-section">
+                            <!-- Populated by JS -->
+                        </section>
+
+                        <!-- Lesson Quiz -->
+                        <section id="lesson-quiz" class="lesson-quiz-section" style="display:none;">
+                            <h3>📝 Lesson Check</h3>
+                            <div id="lesson-quiz-content"></div>
+                        </section>
+
+                        <!-- Anki-Style Rating -->
+                        <section id="lesson-rating" class="lesson-rating-section">
+                            <h3>How well did you know this?</h3>
+                            <p class="rating-subtitle">This helps prioritize your review sessions</p>
+                            <div class="rating-buttons">
+                                <button class="rating-btn again" data-rating="1">
+                                    <span class="rating-label">Again</span>
+                                    <span class="rating-time">< 1 min</span>
+                                </button>
+                                <button class="rating-btn hard" data-rating="2">
+                                    <span class="rating-label">Hard</span>
+                                    <span class="rating-time">2 days</span>
+                                </button>
+                                <button class="rating-btn good" data-rating="3">
+                                    <span class="rating-label">Good</span>
+                                    <span class="rating-time">4 days</span>
+                                </button>
+                                <button class="rating-btn easy" data-rating="4">
+                                    <span class="rating-label">Easy</span>
+                                    <span class="rating-time">7 days</span>
+                                </button>
+                            </div>
+                        </section>
+
+                        <!-- Lesson Navigation -->
+                        <nav class="lesson-footer-nav">
+                            <button id="lesson-prev-btn" class="nav-btn">
+                                ← Previous Lesson
+                            </button>
+                            <button id="lesson-next-btn" class="nav-btn primary">
+                                Next Lesson →
+                            </button>
+                        </nav>
+                    </article>
+                </div>
+            </div>
+
+            <!-- Review Page - Anki Style -->
+            <div id="review" class="page">
+                <div class="page-header">
+                    <h1>Spaced Repetition Review</h1>
+                    <p class="subtitle">Review lessons based on your confidence ratings</p>
+                </div>
+                <div id="review-summary" class="dashboard-card review-summary-card">
+                    <!-- Populated by JS -->
+                </div>
+                <div id="review-container" class="review-container">
+                    <div id="review-empty" class="review-empty">
+                        <div class="empty-icon">🎉</div>
+                        <h3>All caught up!</h3>
+                        <p>No lessons are due for review right now.</p>
+                        <button class="btn btn-primary" onclick="navigateTo('learn')">Continue Learning</button>
+                    </div>
+                    <div id="review-card" class="review-card" style="display:none;">
+                        <div class="review-header">
+                            <span id="review-module" class="review-module">Module</span>
+                            <span id="review-due" class="review-due">Due now</span>
+                        </div>
+                        <h2 id="review-lesson-title">Lesson Title</h2>
+                        <div id="review-content" class="review-content">
+                            <div id="review-question" class="review-question">
+                                <h3>🎯 What You Must Memorize</h3>
+                                <ul id="review-points"></ul>
+                            </div>
+                            <button id="review-show-answer" class="btn btn-primary btn-full">Show Answer & Explanation</button>
+                            <div id="review-answer" class="review-answer" style="display:none;">
+                                <div id="review-body"></div>
+                                <div id="review-explanation"></div>
+                            </div>
+                        </div>
+                        <div id="review-rating" class="review-rating" style="display:none;">
+                            <p>How well did you recall this?</p>
+                            <div class="rating-buttons">
+                                <button class="rating-btn again" data-rating="1">Again</button>
+                                <button class="rating-btn hard" data-rating="2">Hard</button>
+                                <button class="rating-btn good" data-rating="3">Good</button>
+                                <button class="rating-btn easy" data-rating="4">Easy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Page -->
+            <div id="quiz" class="page">
+                <div class="page-header">
+                    <h1>Quiz Practice</h1>
+                    <p class="subtitle">Test your knowledge with module-specific questions</p>
+                </div>
+                <div class="quiz-container">
+                    <div class="quiz-shell">
+                        <div class="quiz-main">
+                            <div id="quiz-setup" class="quiz-setup">
+                                <h3>Select Quiz Mode</h3>
+                                <div class="quiz-modes">
+                                    <button class="quiz-mode-btn" data-mode="current">
+                                        <span class="mode-icon">📚</span>
+                                        <span class="mode-title">Current Module</span>
+                                        <span class="mode-desc">Questions from your last module</span>
+                                    </button>
+                                    <button class="quiz-mode-btn" data-mode="all">
+                                        <span class="mode-icon">🎲</span>
+                                        <span class="mode-title">All Questions</span>
+                                        <span class="mode-desc">Mixed from all modules</span>
+                                    </button>
+                                    <button class="quiz-mode-btn" data-mode="fundamental">
+                                        <span class="mode-icon">🌱</span>
+                                        <span class="mode-title">Fundamentals</span>
+                                        <span class="mode-desc">Core concepts only</span>
+                                    </button>
+                                    <button class="quiz-mode-btn" data-mode="weak">
+                                        <span class="mode-icon">🎯</span>
+                                        <span class="mode-title">Weak Areas</span>
+                                        <span class="mode-desc">Focus on mistakes</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="quiz-game" class="quiz-game" style="display:none">
+                                <!-- Quiz question displayed here -->
+                            </div>
+                        </div>
+                        <aside id="quiz-analytics" class="quiz-analytics-panel dashboard-card">
+                            <!-- Populated by JS -->
+                        </aside>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Use Cases Page -->
+            <div id="practice" class="page">
+                <div class="page-header">
+                    <h1>Use Cases</h1>
+                    <p class="subtitle">Loading the full use-case bank...</p>
+                </div>
+                <div id="practice-modes" class="practice-modes-grid">
+                    <!-- Populated by JS -->
+                </div>
+                <div id="drills-container" class="drills-container">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Code Lab Page -->
+            <div id="code" class="page">
+                <div class="page-header">
+                    <h1>Code Lab</h1>
+                    <p class="subtitle">Loading realistic partner-engineer challenges...</p>
+                </div>
+                <div id="code-container" class="code-layout">
+                    <aside class="code-sidebar">
+                        <h3>Challenges</h3>
+                        <div id="code-challenge-list" class="challenge-list">
+                            <!-- Populated by JS -->
+                        </div>
+                    </aside>
+                    <div class="code-workspace">
+                        <div id="code-description" class="code-description">
+                            <h2>Select a challenge to begin</h2>
+                        </div>
+                        <div id="code-editor-container" class="code-editor-container" style="display:none;">
+                            <div class="editor-toolbar">
+                                <button id="code-run-btn" class="btn btn-primary">▶ Run Tests</button>
+                                <button id="code-hint-btn" class="btn btn-secondary">💡 Hint</button>
+                                <button id="code-solution-btn" class="btn btn-secondary">👁 Show Solution</button>
+                                <button id="code-reset-btn" class="btn btn-danger">↺ Reset</button>
+                            </div>
+                            <div id="monaco-editor" class="monaco-editor"></div>
+                            <div id="code-output" class="code-output">
+                                <div class="output-header">Output</div>
+                                <pre id="output-content"></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Learning Page -->
+            <div id="quick-learning" class="page">
+                <div class="page-header quick-learning-header">
+                    <h1 id="quick-learning-title">Quick Learning Mode</h1>
+                    <p id="quick-learning-subtitle" class="subtitle">Rapid recall. Tight timing. Full-module mastery.</p>
+                </div>
+                <div id="quick-learning-shell" class="quick-learning-shell">
+                    <div class="quick-learning-loading">Choose a module and start Quick Learning.</div>
+                </div>
+            </div>
+
+            <!-- Progress Page -->
+            <div id="progress" class="page">
+                <div class="page-header">
+                    <h1>Your Progress</h1>
+                    <p class="subtitle">Track your journey to interview readiness</p>
+                </div>
+                <div id="progress-content" class="progress-content">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <div id="settings" class="page">
+                <div class="page-header">
+                    <h1>Settings</h1>
+                    <p class="subtitle">Choose which sidebar menus and widgets stay visible.</p>
+                </div>
+                <div class="settings-shell">
+                    <section class="dashboard-card settings-card">
+                        <h3>Sidebar Menus</h3>
+                        <p class="settings-copy">Turn individual sidebar entries on or off without removing the underlying pages.</p>
+                        <div id="settings-menu-list" class="settings-list"></div>
+                    </section>
+                    <section class="dashboard-card settings-card">
+                        <h3>Widgets</h3>
+                        <p class="settings-copy">Control optional UI elements.</p>
+                        <div class="settings-list">
+                            <label class="settings-toggle">
+                                <div>
+                                    <strong>Motivator</strong>
+                                    <p>Show or hide the floating motivator companion.</p>
+                                </div>
+                                <input id="toggle-motivator" type="checkbox" checked>
+                            </label>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+    <div id="milady-motivation" class="milady-motivation hidden" aria-live="polite">
+        <div class="milady-bubble">
+            <p id="milady-message" class="milady-message"></p>
+        </div>
+        <img src="public/milady.png" alt="Milady motivation companion" class="milady-image">
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/glossary.js"></script>
+    <script src="js/training-analytics.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/base-knowledge.js"></script>
+    <script src="js/quick-learning.js"></script>
+    <script src="js/milady-messages.js"></script>
+    <script src="js/learning.js"></script>
+    <script src="js/quiz.js"></script>
+    <script src="js/review.js"></script>
+    <script src="js/code-lab.js"></script>
+</body>
+</html>
